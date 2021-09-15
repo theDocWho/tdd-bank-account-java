@@ -10,44 +10,33 @@ public class AccountTest {
 
 
     @Test
-    public void accountCreationBalanceIsZero() {
-        Account account = new Account();
-        assertThat(account.balance,is(0));
+    public void accountCreationBalanceIsZero() throws Exception {
+        Account account = new Account("USD");
+        assertThat(account.checkBalance(),is("USD "+0));
     }
     @Test
-    public void depositAnAmountToIncreaseTheBalance() {
-
-        //arrange
-        Account account = new Account();
-
-        //act
-        account.deposit(100);
-        //assert (I have money);
-        assertThat(account.balance,is(100));
+    public void depositAnAmountToIncreaseTheBalance() throws Exception {
+        Account account = new Account(100);
+        assertThat(account.checkBalance(),is("INR "+100));
     }
 
     @Test
-    public void checkBalanceAfterMultipleDepositsIsSumOfBalances() {
-        Account account = new Account();
-        account.deposit(100);
+    public void checkBalanceAfterMultipleDepositsIsSumOfBalances() throws Exception {
+        Account account = new Account(100,"USD");
         account.deposit(300);
-        assertThat(account.balance,is(400));
+        assertThat(account.checkBalance(),is("USD "+400));
     }
 
     @Test
-    public void withdrawalOfAmountAndCheckBalanceIsReflectingCorrectValue() {
-        Account account = new Account();
-        //act
-        account.deposit(100);
-        //assert (I have money);
+    public void withdrawalOfAmountAndCheckBalanceIsReflectingCorrectValue() throws Exception {
+        Account account = new Account(100);
         account.withdrawal(50);
-        assertThat(account.balance,is(50));
+        assertThat(account.checkBalance(),is("INR "+50));
     }
 
     @Test
     public void withdrawalOfAmountMoreThanBalanceThrowsBalanceException() throws Exception {
-        Account account = new Account();
-        account.deposit(100);
+        Account account = new Account(100);
 
         boolean exceptionThrown = false;
 
@@ -58,6 +47,7 @@ public class AccountTest {
             exceptionThrown = true;
         }
         assertThat(exceptionThrown,is(true));
+        assertThat(account.checkBalance(),is("INR "+100));
 
 
     }
