@@ -33,4 +33,32 @@ public class AccountTest {
         account.deposit(300);
         assertThat(account.balance,is(400));
     }
+
+    @Test
+    public void withdrawalOfAmountAndCheckBalanceIsReflectingCorrectValue() {
+        Account account = new Account();
+        //act
+        account.deposit(100);
+        //assert (I have money);
+        account.withdrawal(50);
+        assertThat(account.balance,is(50));
+    }
+
+    @Test
+    public void withdrawalOfAmountMoreThanBalanceThrowsBalanceException() throws Exception {
+        Account account = new Account();
+        account.deposit(100);
+
+        boolean exceptionThrown = false;
+
+        try{
+            account.withdrawal(200);
+        }catch (RuntimeException re){
+            assertThat(re.getMessage(),is("The current balance amount  is lower than withdrawal amount"));
+            exceptionThrown = true;
+        }
+        assertThat(exceptionThrown,is(true));
+
+
+    }
 }
