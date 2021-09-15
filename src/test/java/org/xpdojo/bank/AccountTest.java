@@ -126,4 +126,40 @@ public class AccountTest {
         assertThat(account.checkBalance(),is("INR "+150));
 
     }
+
+    @Test
+    public void depositAndWithdrawalAtSameTimeAndBalanceIsCorrectlyReflected() throws Exception {
+        final Account account = new Account(40);
+        final CyclicBarrier cyclicBarrier = new CyclicBarrier(2,()->assertThat(account.checkBalance(),is("INR "+40)));
+        Runnable r1 = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    cyclicBarrier.await();
+                    account.deposit(20);
+                }catch (Exception e){
+                    System.out.println("failed to execute");
+                }
+            }
+        };
+        Runnable r2 = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    cyclicBarrier.await();
+                    account.withdrawal(30);
+                }catch (Exception e){
+                    System.out.println("failed to execute");
+                }
+            }
+        };
+        Thread t1= new Thread(r1);
+        t1.start();
+        Thread t2= new Thread(r2);
+        t2.start();
+        t1.join();
+        t2.join();
+        assertThat(account.checkBalance(),is("INR "+30));
+
+    }
 }

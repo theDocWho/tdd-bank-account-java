@@ -25,7 +25,7 @@ public class Account {
     public void deposit(int i) throws RuntimeException{
         Money money = null;
         try {
-            money = this.balance.poll(1000, TimeUnit.MILLISECONDS);
+            money = this.balance.poll(5000, TimeUnit.MILLISECONDS);
             money = new Money(money.getAmount()+i,money.getCurrency() );
             this.balance.put(money);
         } catch (InterruptedException e) {
@@ -35,19 +35,19 @@ public class Account {
     }
 
     public void withdrawal(int i)throws RuntimeException{
-        if(this.balance.peek().getAmount()-i>=0){
-            try {
-                Money money = this.balance.poll(1000, TimeUnit.MILLISECONDS);
-                money = new Money(money.getAmount()-i,money.getCurrency() );
+        try {
+            Money money = this.balance.poll(5000, TimeUnit.MILLISECONDS);
+            if(money.getAmount()-i>=0){
+               money = new Money(money.getAmount()-i,money.getCurrency() );
+               this.balance.put(money);
+            }else{
                 this.balance.put(money);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                throw new RuntimeException("Account being used by someone else");
+                throw new RuntimeException("The current balance amount  is lower than withdrawal amount");
             }
-        }else{
-            throw new RuntimeException("The current balance amount  is lower than withdrawal amount");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Account being used by someone else");
         }
-
     }
 
     public String checkBalance() throws RuntimeException{
