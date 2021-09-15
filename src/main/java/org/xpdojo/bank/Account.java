@@ -21,24 +21,34 @@ public class Account {
     }
 
 
-    public void deposit(int i) throws Exception{
+    public void deposit(int i) throws RuntimeException{
         Money money = this.balance.poll();
         money = new Money(money.getAmount()+i,money.getCurrency() );
-        this.balance.put(money);
+        try {
+            this.balance.put(money);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Account being used by someone else");
+        }
     }
 
-    public void withdrawal(int i)throws Exception{
+    public void withdrawal(int i)throws RuntimeException{
         if(this.balance.peek().getAmount()-i>=0){
             Money money = this.balance.poll();
             money = new Money(money.getAmount()-i,money.getCurrency() );
-            this.balance.put(money);
+            try {
+                this.balance.put(money);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                throw new RuntimeException("Account being used by someone else");
+            }
         }else{
             throw new RuntimeException("The current balance amount  is lower than withdrawal amount");
         }
 
     }
 
-    public String checkBalance() throws Exception{
+    public String checkBalance() throws RuntimeException{
         return this.balance.peek().getCurrency()+" "+this.balance.peek().getAmount();
     }
 }
