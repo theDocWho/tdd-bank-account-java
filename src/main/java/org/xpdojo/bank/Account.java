@@ -1,14 +1,15 @@
 package org.xpdojo.bank;
 
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class Account {
-    private final BlockingDeque<Money> balance ;
+    private final BlockingQueue<Money> balance ;
 
     public Account(int amount, String currency ){
         if(amount<0) throw new RuntimeException("Account cannot be opened with -ve balance");
-        balance = new LinkedBlockingDeque<>(1);
+        balance = new LinkedBlockingQueue<>(1);
         balance.add(new Money(amount,currency));
     }
 
@@ -22,9 +23,10 @@ public class Account {
 
 
     public void deposit(int i) throws RuntimeException{
-        Money money = this.balance.poll();
-        money = new Money(money.getAmount()+i,money.getCurrency() );
+        Money money = null;
         try {
+            money = this.balance.poll(1000, TimeUnit.MILLISECONDS);
+            money = new Money(money.getAmount()+i,money.getCurrency() );
             this.balance.put(money);
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -34,9 +36,9 @@ public class Account {
 
     public void withdrawal(int i)throws RuntimeException{
         if(this.balance.peek().getAmount()-i>=0){
-            Money money = this.balance.poll();
-            money = new Money(money.getAmount()-i,money.getCurrency() );
             try {
+                Money money = this.balance.poll(1000, TimeUnit.MILLISECONDS);
+                money = new Money(money.getAmount()-i,money.getCurrency() );
                 this.balance.put(money);
             } catch (InterruptedException e) {
                 e.printStackTrace();
